@@ -1,0 +1,39 @@
+body {
+	margin: 0;
+}
+
+#mainbarmenu {
+	padding-bottom: 10px;
+}
+
+#mainDivWindow  >*{
+	float: left;
+}
+
+#divTileWin {
+	border: solid 1px; 
+	overflow: auto;
+}
+
+canvas#mapwin {
+	border: solid 1px;
+	margin-left: 30px;
+}
+
+/***** new map window *****/
+label {
+	padding-right: 10px;
+}
+
+div.container {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	overflow: auto;
+}
+
+div#mapSizeLabel {
+    padding-right: 10px;
+}
+div#mapSize >* {
+    float: left;
+}

@@ -1,0 +1,28 @@
+div#popup {
+	position: absolute;
+    top: 59px;
+    left: 103px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    background-color: #f9f9f9;
+}
+
+div#popup > div#title {
+	background-color: #d6d6d6;
+	text-align: center;
+    padding: 5px;
+	font-size: 20px;
+    font-weight: bold;
+}
+
+div#popup > div#title > img#exitCross{
+	width: 20px;
+    height: 20px;
+	float: right;
+	margin:0;
+	padding:0;
+}
+
+div#popup > div#content {
+	padding: 25px;
+}
