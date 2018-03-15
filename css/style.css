@@ -2,8 +2,9 @@ body {
 	margin: 0;
 }
 
-#mainbarmenu {
-	padding-bottom: 10px;
+#mainDivWindow {
+	overflow: auto;
+    background-color: #f9f9f9;
 }
 
 #mainDivWindow  >*{

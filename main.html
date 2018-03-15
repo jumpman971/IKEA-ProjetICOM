@@ -2,73 +2,59 @@
 	<html lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>TakaEngine</title>
+		<title>Calculateur de Pièces</title>
 		<link rel="icon" type="image/png" href="images/logo.png" />
-		<script type="text/javascript" src="js/popup.js"> </script>
 		<script type="text/javascript" src="js/global.js"> </script>
 		<script type="text/javascript" src="js/tileandmap.js"> </script>
-		<link rel="stylesheet" href="css/popup.css" />
-		<link rel="stylesheet" href="css/w3c-barmenu.css" />
 		<link rel="stylesheet" href="css/style.css" />
 	</head> 
-	<body  oncontextmenu="return false;">
-		<!-- Bar de menu du moteur -->
-		<div id="mainbarmenu">
-			<ul class="mainbar">
-				<li class="dropdown"> 
-					<a href="javascript:void(0)" class="dropbtn">File</a>
-					<div class="dropdown-content">
-						<a href="#">New</a>
-						<a href="#">Open</a>
-						<a href="#">Save</a>
-					</div>					
-				</li>
-				<li class="dropdown"> 
-					<a href="javascript:void(0)" class="dropbtn">Object</a>
-					<div class="dropdown-content">
-						<div class="dropright">
-							<a href="javascript:void(0)" class="droprightbtn">Map</a>
-								<div class="dropright-content">
-									<a href="javascript:openNewMapPopup()">New Map</a>
-									<a href="#">Load Map</a>
-									<a href="#">Import Map</a>
-									<a href="#">Delete Map</a>
-								</div>
-						</div>
-						<div class="dropright">
-							<a href="javascript:void(0)" class="droprightbtn">TileSet</a>
-							<div class="dropright-content">
-								<a href="javascript:openNewTilePopup()">New TileSet</a>
-								<a href="#">Edit TileSet</a>
-								<a href="#">Import TileSet</a>
-								<a href="#">Delete TileSet</a>
-							</div>
-						</div>
-						<div class="dropright">
-							<a href="javascript:void(0)" class="droprightbtn">Character</a>
-						</div>
-					</div>					
-				</li>
-				<li style="float:right"><img src="images/TakaEngine-Logo.png" style="height: 42px;">&nbsp;</img></li>
-			</ul>
+	<body  oncontextmenu="return false;">		
+		<div id="mainDivWindow">
+			<div id="leftSide">
+				<div id="furnitureContainer" class="container">
+					<div class="title">
+						Accessoires
+					</div>
+					<div class="canvasDiv">
+						
+					</div>
+				</div>
+				<div id="logContainer" class="container">
+					<div class="title">
+						Log
+					</div>
+					<select>
+						<option value="valeur1">Valeur 1</option>
+					</select>
+				</div>
+				<div id="cmdContainer" class="container">
+					<div class="title">
+						Saisie
+					</div>
+					<input type="text"></input>
+				</div>
+			</div>
+			<div id="rightSide">
+				<div id="viewerContainer" class="container">
+					<div class="title">
+						Visualiseur
+					</div>
+					<div class="canvasDiv">
+						
+					</div>
+				</div>
+				<div id="dimensionsContainer" class="container">
+					<div class="title">
+						Dimensions
+					</div>
+					<div id="longueur">Longueur : </div>
+					<div id="largeur">Largeur : </div>
+				</div>
+			</div>
 		</div>
-		
-		<div id="mainDivWindow"></div>
 			
 		<script>			
-			/****** Fenetre de base ******/
-			//a supprimer quand les boutons de la bar de menu fonctionnerons
-			/*afficherFenetreTile();
-			afficherFenetreMap();*/
 			
-			
-			/****** Affichage de base pour la vue ******/
-			/*
-			var myCube = createCube(20, 50, 100, 200);
-			//afficherObjet3D(myCube);		//Old: ne plus utiliser si l'on veut pouvoir bouger l'affichage de la vue
-			memoryOfObject3D.push(myCube);	//Sauvegarde les objets 3D de la vue et permet de les raffraichires lors d'un mouvement de la vue
-			memoryOfObject3D.push(createCube(10, 10, 50, 90));
-			refreshScreen();*/
 		</script>
 	</body>
 </html>
