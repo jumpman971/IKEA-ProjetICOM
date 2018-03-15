@@ -1,5 +1,7 @@
 body {
 	margin: 0;
+	display: flex;
+    justify-content: center;
 }
 
 #mainDivWindow {
@@ -11,30 +13,29 @@ body {
 	float: left;
 }
 
-#divTileWin {
-	border: solid 1px; 
-	overflow: auto;
-}
-
-canvas#mapwin {
-	border: solid 1px;
-	margin-left: 30px;
-}
-
-/***** new map window *****/
-label {
-	padding-right: 10px;
-}
-
 div.container {
-	padding-top: 5px;
-	padding-bottom: 5px;
-	overflow: auto;
+	margin: 10px;
+    border: solid 1px;
 }
 
-div#mapSizeLabel {
-    padding-right: 10px;
+div.title {
+	padding-bottom: 5px;
 }
-div#mapSize >* {
-    float: left;
+
+div.inner {
+	padding: 10px;
+}
+
+div.canvasDiv {
+    background-color: #d0f2ff;
+}
+
+#furnitureContainer .canvasDiv {
+	height: 500px;
+    width: 500px;
+}
+
+#viewerContainer .canvasDiv {
+	height: 500px;
+    width: 670px;
 }
