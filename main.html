@@ -4,58 +4,68 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<title>Calculateur de Pièces</title>
 		<link rel="icon" type="image/png" href="images/logo.png" />
+		<script type="text/javascript" src="js/tools.js"> </script>
 		<script type="text/javascript" src="js/global.js"> </script>
-		<script type="text/javascript" src="js/tileandmap.js"> </script>
 		<link rel="stylesheet" href="css/style.css" />
 	</head> 
 	<body  oncontextmenu="return false;">		
 		<div id="mainDivWindow">
 			<div id="leftSide">
 				<div id="furnitureContainer" class="container">
-					<div class="inner">						
+					<div class="titleContainer">
 						<div class="title">
 							Accessoires
 						</div>
+					</div>
+					<div class="inner">
 						<div class="canvasDiv">
 							
 						</div>
 					</div>
 				</div>
 				<div id="logContainer" class="container">
-					<div class="inner">
+					<div class="titleContainer">
 						<div class="title">
 							Log
 						</div>
+					</div>
+					<div class="inner">
 						<select>
 							<option value="valeur1">Valeur 1</option>
 						</select>
 					</div>
 				</div>
 				<div id="cmdContainer" class="container">
-					<div class="inner">
+					<div class="titleContainer">
 						<div class="title">
 							Saisie
 						</div>
+					</div>
+					<div class="inner">
 						<input type="text"></input>
 					</div>
 				</div>
 			</div>
 			<div id="rightSide">
 				<div id="viewerContainer" class="container">
-					<div class="inner">
+					<div class="titleContainer"> 
 						<div class="title">
 							Visualiseur
 						</div>
+					</div>
+					<div class="inner">
 						<div class="canvasDiv">
 							
 						</div>
 					</div>
 				</div>
 				<div id="dimensionsContainer" class="container">
-					<div class="inner">
+					<div class="titleContainer">
 						<div class="title">
 							Dimensions
 						</div>
+					</div>
+					<div class="inner">
 						<div id="longueur">Longueur : </div>
 						<div id="largeur">Largeur : </div>
 					</div>
@@ -64,7 +74,7 @@
 		</div>
 			
 		<script>			
-			
+			loadFurniture('test', ["101", "101", "111"]); //test
 		</script>
 	</body>
 </html>
