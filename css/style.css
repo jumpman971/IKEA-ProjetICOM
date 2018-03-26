@@ -15,11 +15,19 @@ body {
 
 div.container {
 	margin: 10px;
-    border: solid 1px;
+    border: solid 1px #dfe2e5;
+}
+
+div.titleContainer {
+	border-bottom: solid 1px #dfe2e5;
+	background-color: #d0f2ff;
 }
 
 div.title {
+	padding-top: 5px;
 	padding-bottom: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 div.inner {
@@ -27,7 +35,29 @@ div.inner {
 }
 
 div.canvasDiv {
-    background-color: #d0f2ff;
+    
+}
+
+div.accessoire {
+	//width: 120px;
+    //height: 130px;
+    background-color: #9abaf5;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.caseMeuble {
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: #fffdc4;
+    height: 48px;
+    width: 48px;
+}
+
+div.nameContainer >* {
+	float: left;
+}
+
+div.nameLabel {
+	padding-right: 10px;
 }
 
 #furnitureContainer .canvasDiv {

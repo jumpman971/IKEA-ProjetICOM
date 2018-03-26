@@ -1,160 +1,197 @@
-/****** Fonction Canvas ******/
-function getCanvas(canvasName) {
-	var canvas = document.getElementById(canvasName);
-    if(!canvas) {
-        alert("Impossible de récupérer le canvas");
-        return null;
-    }
+var room;
+var furnitures = [];
+//un meuble = cases [{coordonnées, meuble(pere)},...]
 
-    var context = canvas.getContext('2d');
-    if(!context) {
-        alert("Impossible de récupérer le context du canvas");
-        return null;
-    }
-	
-	return {"canvas": canvas, "context": context}
-}
+/*****************************************/
+/************* CONSTRUCTEURS *************/
+/*****************************************/
 
-var Point2D = {x: 0, y: 0};
-
-var winH, winW;
-winW = 640;
-winH = 480;
-
-var memoryOf2DObject = [];				//Liste d'objet 2D créé dans la map actuel, permet de les réaffichés automatiquement lorsqu'il y a changement de position de l'oeil
-var oldX, oldY;
-oldX = 0;
-oldY = 0;
-
-mapMove = false;
-
-function $(name) {
-	return document.getElementById(name);
-}
-
-function $$(name) {
-	return document.querySelectorAll(name);
-}
-
-function Element(type, parameter) {
-	var r = document.createElement(type);
-	
-	for (param in parameter) {
-		if (param === 'html')
-			r.innerHTML = parameter[param];
-		else if (param === 'class')
-			r.setAttribute(param, parameter[param]);
-		else
-			r[param] = parameter[param];
+/*
+ * Constructeur Room
+ * Description: Instancie un objet de type 'room', qui correspond à la salle à aménager.
+ * 
+ * metreCarre: taille en mètre carré de la salle (1m² => 1case)
+ */
+function Room(metreCarre) {
+	var tab = [[]];
+	for (var i = 0; i < metreCarre; ++i) {
+		for (var j = 0; j < metreCarre; ++j)
+			tab[i][j] = {};
 	}
 	
-	return r;
+	return {taille: metreCarre, empty: true, tableau: tab};
 }
 
-function inject (elem) {
-	elem.appendChild(this);
+/*
+ * Constructeur Furniture
+ * Description: Instancie un objet de type 'furniture', qui correspond à un meuble.
+ * 
+ * nom: nom du meuble
+ * forme: forme du meuble qui est un tableau 2D booléen (ou d'entier) où une case vide est 0, sinon 1
+ */
+function Furniture(nom, forme) {
+	var f = {name: nom, shape: forme, 'shapeToHtml': shapeToHtml};
 	
-	return this;
+	function shapeToHtml() {
+		var table = new Element('table');
+		for (var i = 0; i < f.shape.length; ++i) {
+			var tr = new Element('tr').inject(table);
+			for (var j = 0; j < f.shape[i].length; ++j) {
+				var td = new Element('td').inject(tr);
+				var src = "images/meuble/";
+				//si coté nord/ouest
+				if (i===0 && j === 0)
+					src += "case-nord_ouest";
+				//si coté nord/est
+				else if (i===0 && j === f.shape[i].length-1)
+					src += "case-nord_est";
+				//si coté sud/ouest
+				else if (i===f.shape.length-1 && j === 0)
+					src += "case-sud_ouest";
+				//si coté sud/est
+				else if (i===f.shape.length-1 && j === f.shape[i].length-1)
+					src += "case-sud_est";
+				//si coté nord
+				else if (i===0 && (j !== f.shape[i].length-1 && j !== 0))
+					src += "case-nord";
+				//si coté ouest
+				else if ((i !== f.shape.length-1 && i !== 0) && j===0)
+					src += "case-ouest";
+				//si coté est
+				else if ((i !== f.shape.length-1 && i !== 0) && j===f.shape[i].length-1)
+					src += "case-est";
+				//si coté sud
+				else if (i===f.shape.length-1 && (j !== f.shape[i].length-1 && j !== 0))
+					src += "case-sud";
+				//sinon pièce milieu (ou pas)
+				else
+					src = "";
+				
+				if (f.shape[i].charAt(j)==="1")
+					new Element('img', {'class':'caseMeuble', 'src':src+".png"}).inject(td);
+				else
+					new Element('img', {'class':'caseMeuble vide', 'src':src+".png"}).inject(td);
+			}
+		}
+		return table;
+	}
+	
+	return f;
 }
 
+/*************************************/
+/************* EVENEMENT *************/
+/*************************************/
 document.addEventListener('DOMContentLoaded', function() {
-	HTMLElement.prototype.inject = inject
+	$$('#cmdContainer input')[0].addEventListener('keydown', function onInputCmdKeyPress(e) {
+		if (e.keyCode == 13) //on appui sur la touche entrer
+			sendCmd(e.target.value);
+	});
 });
 
-/***** MenuBar Buttons *****/
+/*********************************************/
+/************* FONCTIONS GENERAL *************/
+/*********************************************/
 
-function openNewMapPopup() {
-	var c = new Element('div', {'id':'newMapWin'});
-		var mapName = new Element('div', {'id':'mapName', 'class':'container'}).inject(c);
-			new Element('label', {'for':'mapName', 'html':'Map Name'}).inject(mapName);
-			new Element('input', {'id':'inputMapName', 'name':'mapName', 'type':'text'}).inject(mapName);
-			
-		var mapSize = new Element('div', {'id':'mapSize', 'class':'container'}).inject(c);
-			var div2 = new Element('div', {'id':'mapSizeLabel', 'html':'Map Size'}).inject(mapSize);
-			div2 = new Element('div', {'id':'subDivMapSize'}).inject(mapSize);
-				var line = new Element('div', {'id':'mapHeightDiv'}).inject(div2);
-					new Element('label', {'for':'mapHeight', 'html':'Map Height'}).inject(line);
-					new Element('input', {'id':'inputMapHeight', 'name':'mapHeight', 'type':'text'}).inject(line);
-				line = new Element('div', {'id':'mapWidthDiv'}).inject(div2);
-					new Element('label', {'for':'mapWidth', 'html':'Map Width'}).inject(line);
-					new Element('input', {'id':'inputMapWidth', 'name':'mapWidth', 'type':'text'}).inject(line);
-					
-		//tile selector		
-		new TileSelector().inject(c);
-
-		//buttons
-		var div = new Element('div', {'id':'buttons'}).inject(c);
-			var bp = new Element('input', {'type':'button','value':'Cancel'}).inject(div).addEventListener('click', function(e) {
-				$('popup').remove();
-			});
-			var bp = new Element('input', {'type':'button','value':'Validate'}).inject(div).addEventListener('click', function(e) {
-				//create and open new map
-				var m = new Map($('inputMapName').innerHTML, $('inputMapHeight').innerHTML, $('inputMapWidth').innerHTML, tileSetSelected);
-				mapList.push(m);
-				$('popup').remove();
-				afficherFenetreMap(m);
-			});
-	
-	new Popup('New Map', c);
+/*
+ * Fonction sendCmd
+ * Description: Envoie une commande de type 'texte' (string) au compilateur pour qu'elle soit interprétée.
+ *
+ * cmd: la commande de type 'texte' (string)
+ */
+function sendCmd(cmd) {
+	alert("cmd envoyé"); //à supprimer
+	$$('#cmdContainer input')[0].value = "";
 }
 
-function openNewTilePopup() {
-	var main = new Element('div', {'id':'newTileWin'});
-		var div = new Element('div', {'id':'tileNameContainer'}).inject(main);
-			new Element('label', {'for':'tileNameInput', 'html':'TileSet Name'}).inject(div);
-			new Element('input', {'id':'tileNameInput', 'type':'text'}).inject(div);
-			
-		div = new Element('div', {'id':'tileLengthContainer'}).inject(main);
-			var div2 = new Element('div', {'id':'labelTileLength', 'html':'Tile Length'}).inject(div);
-			div2 = new Element('div', {'id':'subDivTileLength'}).inject(div);
-				var line = new Element('div', {'id':'tileHeightDiv'}).inject(div2);
-					new Element('label', {'for':'tileHeightInput', 'html':'Tile Height'}).inject(line);
-					new Element('input', {'id':'tileHeightInput', 'type':'text'}).inject(line);
-				line = new Element('div', {'id':'tileWidthDiv'}).inject(div2);
-					new Element('label', {'for':'tileWidthInput', 'html':'Tile Width'}).inject(line);
-					new Element('input', {'id':'tileWidthInput', 'type':'text'}).inject(line);
-		
-		var div = new Element('div', {'id':'tileSetFile'}).inject(main);
-			new Element('label', {'for':'tileSetPath', 'html':'TileSet Path'}).inject(div);
-			new Element('input', {'id':'tileSetPathInput', 'type':'file'}).inject(div);
-			
-		div = new Element('div', {'id':'buttons'}).inject(main);
-			var bp = new Element('input', {'type':'button','value':'Cancel'}).inject(div).addEventListener('click', function(e) {
-				$('popup').remove();
-			});
-			var bp = new Element('input', {'type':'button','value':'Validate'}).inject(div).addEventListener('click', function(e) {
-				tileList.push(new TileSet($('tileNameInput').innerHTML, $('tileHeightInput').innerHTML, $('tileWidthInput').innerHTML, $('tileSetPathInput').files[0]));
-				$('popup').remove();
-				new PopupMsg('New Tile', 'New Tile successfully created!');
-			});
-	
-	new Popup('New Tile', main);
+/*
+ * Fonction loadFurniture
+ * Description: Instancie et ajoute un objet de type 'furniture' dans les accessoires.
+ * 		L'affichage est rafraichie automatiquement.
+ *
+ * nom: nom du meuble
+ * forme: forme du meuble qui est un tableau 2D booléen (ou d'entier) où une case vide est 0, sinon 1
+ */
+function loadFurniture(nom, forme) {
+	furnitures.push(new Furniture(nom, forme));
+	refreshFurnitureView();
 }
 
-function openCharMenu() {
-	var main = new Element('div', {'id':'charWin'});
-		var div = new Element('div', {'id':'leftDiv'}).inject(main);
-			var s = new Element('select', {'id':'selectChar', 'size':'8', 'style':"height: 160px; width: 200px; visibility: visible;"}).inject(div);
-				new Element('option', {'value':'0', 'html':'Batman'}).inject(s);
-			
-		div = new Element('div', {'id':'rightDiv'}).inject(main);
-			new Element('label', {'for':'charNameInput', 'html':'Character Name'}).inject(line);
-			new Element('input', {'id':'charNameInput', 'name':'charNameInput', 'type':'text'}).inject(line);
-		
-		//charset selector
-		//new CharSetSelector().inject(main);
-		
-		//skill creator
-		
-		div = new Element('div', {'id':'buttons'}).inject(main);
-			var bp = new Element('input', {'type':'button','value':'Cancel'}).inject(div).addEventListener('click', function(e) {
-				$('popup').remove();
-			});
-			var bp = new Element('input', {'type':'button','value':'Validate'}).inject(div).addEventListener('click', function(e) {
-				tileList.push(new TileSet($('tileNameInput').innerHTML, $('tileHeightInput').innerHTML, $('tileWidthInput').innerHTML, $('tileSetPathInput').files[0]));
-				$('popup').remove();
-				new PopupMsg('New Tile', 'New Tile successfully created!');
-			});
-	
-	new Popup('Character Menu', main);
+/*
+ * Fonction addFurnitureToRoom
+ * Description: Ajoute un meuble de type 'furniture' dans la salle aux coordonnées x y.
+ * 		L'affichage est rafraichie automatiquement.
+ *
+ * meuble: objet de type 'furniture' représentant un meuble.
+ * x: coordonnées horizontal dans la salle.
+ * y: coordonnées vertical dans la salle.
+ */
+function addFurnitureToRoom(meuble, x, y) {
+	//cases [{coordonnées, meuble(pere)},...]
+	room.tableau[y][x] = {'x':x, 'y': y, 'meuble': meuble};
+	room.empty = false;
+	refreshRoomView();
+}
+
+/*
+ * Fonction setRoomSize
+ * Description: Modifie la taille de la salle (supprime tout meuble à l'interieur).
+ * 		L'affichage est rafraichie automatiquement.
+ *
+ * metreCarre: taille en mètre carré de la salle (1m² => 1case)
+ */
+function setRoomSize(metreCarre)  {
+	room = new Room(metreCarre);
+	refreshRoomView();
+}
+
+/******************************************************************/
+/************* FONCTIONS DE RAFRAICHISSEMENT DES VUES *************/
+/******************************************************************/
+
+/*
+ * Fonction refreshFurnitureView
+ * Description: affiche (ou réaffiche) la vue des accessoires et les accessoires qui y sont cotenu.
+ */
+function refreshFurnitureView() {
+	var main = $$("#furnitureContainer .canvasDiv")[0];
+		var table = new Element('table').inject(main);
+			var tr;
+			for (var i = 0; i < furnitures.length; ++i) {
+				if (i%3 === 0)
+					tr = new Element('tr').inject(table);
+				var f = furnitures[i];
+					var td = new Element('td').inject(tr);
+						var div = new Element('div', {'id':f.name, 'class':'accessoire'}).inject(tr);
+							div = new Element('div', {'class':'inner'}).inject(div);
+								var name = new Element('div', {'class':'nameContainer'}).inject(div);
+									new Element('div', {'class':'nameLabel', 'html':'Nom:'}).inject(name);
+									new Element('div', {'class':'name', 'html':f.name}).inject(name);
+								var shape = new Element('div', {'class':'shapeContainer'}).inject(div);
+									f.shapeToHtml().inject(shape);
+			}
+}
+
+/*
+ * Fonction refreshRoomView
+ * Description: affiche (ou réaffiche) la vue de la salle à aménager avec les meubles qui sont contenu dans celle-ci.
+ */
+function refreshRoomView() {
+	var main = $$("#viewerContainer .canvasDiv")[0];
+		var table = new Element('table').inject(main);
+			for (var i = 0; i < room.taille; ++i) {
+				var tr = new Element('tr').inject(table);
+				var f = furnitures[i];
+				for (var j = 0; j < room.taille; ++j) {
+					var c = room.tableau[i][j];
+					var td = new Element('td').inject(tr);
+						var div = new Element('div', {'id':c, 'class':'accessoire'}).inject(tr);
+							div = new Element('div', {'class':'inner'}).inject(div);
+								var name = new Element('div', {'class':'nameContainer'}).inject(div);
+									new Element('div', {'class':'nameLabel', 'html':'Nom:'}).inject(name);
+									new Element('div', {'class':'name', 'html':f.name}).inject(name);
+								var shape = new Element('div', {'class':'shapeContainer'}).inject(div);
+									f.shapeToHtml().inject(shape);
+				}
+			}
 }
