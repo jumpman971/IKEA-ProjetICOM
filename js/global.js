@@ -100,7 +100,21 @@ document.addEventListener('DOMContentLoaded', function() {
  * cmd: la commande de type 'texte' (string)
  */
 function sendCmd(cmd) {
-	alert("cmd envoyé"); //à supprimer
+	//alert("cmd envoyé"); //à supprimer
+	//var text = $("#textarea").val();
+	var filename = "to_compile.com";
+	var blob = new Blob([cmd], {type: "text/plain;charset=utf-8"});
+	//saveAs(blob, filename+".com");
+	var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(cmd));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
 	$$('#cmdContainer input')[0].value = "";
 }
 
