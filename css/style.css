@@ -4,6 +4,10 @@ body {
     justify-content: center;
 }
 
+/*#com_script {
+	display: none;
+}*/
+
 #mainDivWindow {
 	overflow: auto;
     background-color: #f9f9f9;
