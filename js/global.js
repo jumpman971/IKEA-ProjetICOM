@@ -156,12 +156,13 @@ function addFurnitureToRoom(nomMeuble, x, y) {
 	var meuble = getFurnitureByName(nomMeuble);
 	var x2, y2;
 	for (var i = 0; i < meuble.shape.length; ++i) {
-		y2 = y + x;		
+		y2 = y + i;		
 		for (var j = 0; j < meuble.shape[i].length; ++j) {
 			x2 = x + j;
 			var td = meuble.caseToTdAt(j, i);
-			//room.tableau[y2][x2] = {'x':x, 'y': y, 'x0': j, 'y0':i, 'meuble': meuble};
-			room.tableau[y2][x2] = new CaseRoom(x, y, j, i, meuble);
+			if (typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+				room.tableau[y2][x2] = new CaseRoom(x, y, j, i, meuble);
+			
 		}
 	}
 	room.empty = false;
@@ -213,6 +214,7 @@ function refreshFurnitureView() {
  */
 function refreshRoomView() {
 	var main = $$("#viewerContainer .canvasDiv")[0];
+		main.innerHTML = "";
 		var table = new Element('table').inject(main);
 			for (var i = 0; i < room.taille; ++i) {
 				var tr = new Element('tr').inject(table);
@@ -220,10 +222,10 @@ function refreshRoomView() {
 					var c = room.tableau[i][j];
 					var td = new Element('td').inject(tr);
 						if (typeof c.meuble !== 'undefined') {
-							var div = new Element('div', {'id':c.meuble.name}).inject(tr);
-								c.meuble.caseToTdAt(c.yo, c.x0).inject(div);
+							var div = new Element('div', {'id':c.meuble.name}).inject(td);
+								c.meuble.caseToTdAt(c.x0, c.y0).inject(div);
 						} else {
-							new Element('div', {'class':'caseMeuble'}).inject(td);
+							new Element('div', {'class':'caseVide'}).inject(td);
 						}
 				}
 			}
