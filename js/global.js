@@ -255,6 +255,17 @@ function moveFurniture(x0, y0, x, y) {
 }
 
 /*
+ * Fonction rotateFurniture
+ * Description: Duplique et effectue une rotation du meuble dans le sens horaire (par défaut).
+ *
+ * meuble: un meuble de type 'Furniture'.
+ * antiHoraire: (optionnelle) si vraie, le meuble sera tourné dans le sens anti-horaire.
+ */
+function moveFurniture(meuble, antiHoraire) {
+	
+}
+
+/*
  * Fonction addLog
  * Description: Ajout un message dans la vue des logs.
  *
