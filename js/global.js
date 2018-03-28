@@ -13,13 +13,18 @@ var furnitures = [];
  * metreCarre: taille en mètre carré de la salle (1m² => 1case)
  */
 function Room(metreCarre) {
-	var tab = [[]];
+	var tab = [];
 	for (var i = 0; i < metreCarre; ++i) {
+		tab[i] = [];
 		for (var j = 0; j < metreCarre; ++j)
-			tab[i][j] = {};
+			tab[i][j] = new CaseRoom();
 	}
 	
 	return {taille: metreCarre, empty: true, tableau: tab};
+}
+
+function CaseRoom(x, y, x0, y0, meuble) {
+	return {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble};
 }
 
 /*
@@ -30,50 +35,55 @@ function Room(metreCarre) {
  * forme: forme du meuble qui est un tableau 2D booléen (ou d'entier) où une case vide est 0, sinon 1
  */
 function Furniture(nom, forme) {
-	var f = {name: nom, shape: forme, 'shapeToHtml': shapeToHtml};
+	var f = {name: nom, shape: forme, 'shapeToHtml': shapeToHtml, 'caseToTdAt': caseToTdAt};
 	
 	function shapeToHtml() {
 		var table = new Element('table');
 		for (var i = 0; i < f.shape.length; ++i) {
 			var tr = new Element('tr').inject(table);
 			for (var j = 0; j < f.shape[i].length; ++j) {
-				var td = new Element('td').inject(tr);
-				var src = "images/meuble/";
-				//si coté nord/ouest
-				if (i===0 && j === 0)
-					src += "case-nord_ouest";
-				//si coté nord/est
-				else if (i===0 && j === f.shape[i].length-1)
-					src += "case-nord_est";
-				//si coté sud/ouest
-				else if (i===f.shape.length-1 && j === 0)
-					src += "case-sud_ouest";
-				//si coté sud/est
-				else if (i===f.shape.length-1 && j === f.shape[i].length-1)
-					src += "case-sud_est";
-				//si coté nord
-				else if (i===0 && (j !== f.shape[i].length-1 && j !== 0))
-					src += "case-nord";
-				//si coté ouest
-				else if ((i !== f.shape.length-1 && i !== 0) && j===0)
-					src += "case-ouest";
-				//si coté est
-				else if ((i !== f.shape.length-1 && i !== 0) && j===f.shape[i].length-1)
-					src += "case-est";
-				//si coté sud
-				else if (i===f.shape.length-1 && (j !== f.shape[i].length-1 && j !== 0))
-					src += "case-sud";
-				//sinon pièce milieu (ou pas)
-				else
-					src = "";
-				
-				if (f.shape[i].charAt(j)==="1")
-					new Element('img', {'class':'caseMeuble', 'src':src+".png"}).inject(td);
-				else
-					new Element('img', {'class':'caseMeuble vide', 'src':src+".png"}).inject(td);
+				caseToTdAt(j, i).inject(tr);
 			}
 		}
 		return table;
+	}
+	
+	function caseToTdAt(x, y) {
+		var td = new Element('td');
+		var src = "images/meuble/";
+		//si coté nord/ouest
+		if (y===0 && x === 0)
+			src += "case-nord_ouest";
+		//si coté nord/est
+		else if (y===0 && x === f.shape[y].length-1)
+			src += "case-nord_est";
+		//si coté sud/ouest
+		else if (y===f.shape.length-1 && x === 0)
+			src += "case-sud_ouest";
+		//si coté sud/est
+		else if (y===f.shape.length-1 && x === f.shape[y].length-1)
+			src += "case-sud_est";
+		//si coté nord
+		else if (y===0 && (x !== f.shape[y].length-1 && x !== 0))
+			src += "case-nord";
+		//si coté ouest
+		else if ((y !== f.shape.length-1 && y !== 0) && x===0)
+			src += "case-ouest";
+		//si coté est
+		else if ((y !== f.shape.length-1 && y !== 0) && x===f.shape[y].length-1)
+			src += "case-est";
+		//si coté sud
+		else if (y===f.shape.length-1 && (x !== f.shape[y].length-1 && x !== 0))
+			src += "case-sud";
+		//sinon pièce milieu (ou pas)
+		else
+			src = "";
+		
+		if (f.shape[y].charAt(x)==="1")
+			new Element('img', {'class':'caseMeuble', 'src':src+".png"}).inject(td);
+		//else
+			//new Element('img', {'class':'caseMeuble vide', 'src':"images/meuble/case-vide.png"}).inject(td);
+		return td;
 	}
 	
 	return f;
@@ -83,10 +93,10 @@ function Furniture(nom, forme) {
 /************* EVENEMENT *************/
 /*************************************/
 document.addEventListener('DOMContentLoaded', function() {
-	$$('#cmdContainer input')[0].addEventListener('keydown', function onInputCmdKeyPress(e) {
+	/*$$('#cmdContainer input')[0].addEventListener('keydown', function onInputCmdKeyPress(e) {
 		if (e.keyCode == 13) //on appui sur la touche entrer
 			sendCmd(e.target.value);
-	});
+	});*/
 });
 
 /*********************************************/
@@ -99,10 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
  *
  * cmd: la commande de type 'texte' (string)
  */
-function sendCmd(cmd) {
+/*function sendCmd(cmd) {
 	alert("cmd envoyé"); //à supprimer
 	$$('#cmdContainer input')[0].value = "";
-}
+}*/
 
 /*
  * Fonction loadFurniture
@@ -118,17 +128,42 @@ function loadFurniture(nom, forme) {
 }
 
 /*
+ * Fonction getFurnitureByName
+ * Description: Cherche et récupère un meuble par rapport à son nom
+ *
+ * nom: nom du meuble
+ *
+ * retourne: meuble de type Furniture
+ */
+function getFurnitureByName(nom) {
+	for (var i = 0; i < furnitures.length; ++i) {
+		if (furnitures[i].name === nom)
+			return furnitures[i];
+	}
+	return null;
+}
+
+/*
  * Fonction addFurnitureToRoom
  * Description: Ajoute un meuble de type 'furniture' dans la salle aux coordonnées x y.
  * 		L'affichage est rafraichie automatiquement.
  *
- * meuble: objet de type 'furniture' représentant un meuble.
+ * nomMeuble: nom d'un meuble.
  * x: coordonnées horizontal dans la salle.
  * y: coordonnées vertical dans la salle.
  */
-function addFurnitureToRoom(meuble, x, y) {
-	//cases [{coordonnées, meuble(pere)},...]
-	room.tableau[y][x] = {'x':x, 'y': y, 'meuble': meuble};
+function addFurnitureToRoom(nomMeuble, x, y) {
+	var meuble = getFurnitureByName(nomMeuble);
+	var x2, y2;
+	for (var i = 0; i < meuble.shape.length; ++i) {
+		y2 = y + x;		
+		for (var j = 0; j < meuble.shape[i].length; ++j) {
+			x2 = x + j;
+			var td = meuble.caseToTdAt(j, i);
+			//room.tableau[y2][x2] = {'x':x, 'y': y, 'x0': j, 'y0':i, 'meuble': meuble};
+			room.tableau[y2][x2] = new CaseRoom(x, y, j, i, meuble);
+		}
+	}
 	room.empty = false;
 	refreshRoomView();
 }
@@ -181,17 +216,15 @@ function refreshRoomView() {
 		var table = new Element('table').inject(main);
 			for (var i = 0; i < room.taille; ++i) {
 				var tr = new Element('tr').inject(table);
-				var f = furnitures[i];
 				for (var j = 0; j < room.taille; ++j) {
 					var c = room.tableau[i][j];
 					var td = new Element('td').inject(tr);
-						var div = new Element('div', {'id':c, 'class':'accessoire'}).inject(tr);
-							div = new Element('div', {'class':'inner'}).inject(div);
-								var name = new Element('div', {'class':'nameContainer'}).inject(div);
-									new Element('div', {'class':'nameLabel', 'html':'Nom:'}).inject(name);
-									new Element('div', {'class':'name', 'html':f.name}).inject(name);
-								var shape = new Element('div', {'class':'shapeContainer'}).inject(div);
-									f.shapeToHtml().inject(shape);
+						if (typeof c.meuble !== 'undefined') {
+							var div = new Element('div', {'id':c.meuble.name}).inject(tr);
+								c.meuble.caseToTdAt(c.yo, c.x0).inject(div);
+						} else {
+							new Element('div', {'class':'caseMeuble'}).inject(td);
+						}
 				}
 			}
 }

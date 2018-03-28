@@ -6,7 +6,6 @@
 		<link rel="icon" type="image/png" href="images/logo.png" />
 		<script type="text/javascript" src="js/tools.js"> </script>
 		<script type="text/javascript" src="js/global.js"> </script>
-		<!--<script id="com_script" type="text/javascript" src="js/com.js"> </script>-->
 		<link rel="stylesheet" href="css/style.css" />
 	</head> 
 	<body  oncontextmenu="return false;">		
@@ -74,32 +73,12 @@
 			</div>
 		</div>
 		
-		<!-- <script>			
-			loadFurniture('test', ["101", "101", "111"]); //test
-		</script> -->
 		<script>
-			/*<OBJECT data="file_to_include.html">
-			Warning: file_to_include.html could not be included.
-			</OBJECT>*/
-			/*function loadComFile() {
-				//$("com_script").load("compilateur/com.html"); 
-				//new Element('object', {'data':"compilateur/com.html"}).inject($('com_script'));
-				//new Element('object', {'data':"compilateur/com.html"}).inject($('com_script'));
-			}			
-			function reload_comFile() {
-				$('cmd_to_execute').innerHTML = "";
-				$('com_script').innerHTML = "";
-				//new Element('script', {'id':'com_script', 'src': src}).inject($$('head')[0]);
-				loadComFile();
-			}*/
 			function reload_js() {
 				if ($('com_script'))
 					$('com_script').remove();
 				new Element('script', {'id':'com_script', 'type':'text/javascript', 'src':'js/com.js'}).inject($$('head')[0]);
-				//console.log("readeddddd");
 			}
-			//reload_comFile();
-			//loadComFile();
 			var id = setInterval(frame, 50);
 
 			function frame() {

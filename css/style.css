@@ -4,10 +4,6 @@ body {
     justify-content: center;
 }
 
-/*#com_script {
-	display: none;
-}*/
-
 #mainDivWindow {
 	overflow: auto;
     background-color: #f9f9f9;
@@ -72,4 +68,5 @@ div.nameLabel {
 #viewerContainer .canvasDiv {
 	height: 500px;
     width: 670px;
+	overflow: auto;
 }
