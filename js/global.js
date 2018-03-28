@@ -11,6 +11,8 @@ var furnitures = [];
  * Description: Instancie un objet de type 'room', qui correspond à la salle à aménager.
  * 
  * metreCarre: taille en mètre carré de la salle (1m² => 1case)
+ *
+ * retourne: une salle de type 'Room'
  */
 function Room(metreCarre) {
 	var tab = [[]];
@@ -23,15 +25,45 @@ function Room(metreCarre) {
 }
 
 /*
+ * Constructeur CaseRoom
+ * Description: Instancie un objet de type 'caseRoom', qui correspond à un emplacement d'1m² dans la salle.
+ * 
+ * x: position horizontal (en m²) de l'emplacement 0 (de la première case) du meuble dans la salle
+ * y: position vertical (en m²) de l'emplacement 0  (de la première case) du meuble dans la salle
+ * x0: position horizontal (en m²) d'une partie du meuble
+ * y0: position vertical (en m²) d'une partie du meuble
+ * meuble: un meuble de type 'furniture'
+ *
+ * retourne: une case de la salle de type 'CaseRoom'
+ */
+function CaseRoom(x, y, x0, y0, meuble) {
+	return {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble};
+}
+
+/*
  * Constructeur Furniture
  * Description: Instancie un objet de type 'furniture', qui correspond à un meuble.
  * 
  * nom: nom du meuble
  * forme: forme du meuble qui est un tableau 2D booléen (ou d'entier) où une case vide est 0, sinon 1
+ *
+ * retourne: un meuble de type 'Furniture'
  */
 function Furniture(nom, forme) {
-	var f = {name: nom, shape: forme, 'shapeToHtml': shapeToHtml};
+	var f = {
+		'name': nom, 
+		'shape': forme, 
+		'shapeToHtml': shapeToHtml, 
+		'caseToTdAt': caseToTdAt, 
+		'collideInRoom': collideInRoom
+	};
 	
+	/*
+	 * Fonction shapeToHtml
+	 * Description: Convertie le meuble en un tableau html correspondant à l'aspect du meuble.
+	 *
+	 * retourne: un objet html de type 'table'
+	 */
 	function shapeToHtml() {
 		var table = new Element('table');
 		for (var i = 0; i < f.shape.length; ++i) {
@@ -76,6 +108,76 @@ function Furniture(nom, forme) {
 		return table;
 	}
 	
+	/*
+	 * Fonction caseToTdAt
+	 * Description: Convertie une case de coordonnées x/y du meuble en un objet html de type 'td'.
+	 *
+	 * x: coordonnées horizontal d'une partie du meuble.
+	 * y: coordonnées vertical d'une partie du meuble.
+	 *
+	 * retourne: un objet html de type 'td'
+	 */
+	function caseToTdAt(x, y) {
+		var td = new Element('td');
+		var src = "images/meuble/";
+		//si coté nord/ouest
+		if (y===0 && x === 0)
+			src += "case-nord_ouest";
+		//si coté nord/est
+		else if (y===0 && x === f.shape[y].length-1)
+			src += "case-nord_est";
+		//si coté sud/ouest
+		else if (y===f.shape.length-1 && x === 0)
+			src += "case-sud_ouest";
+		//si coté sud/est
+		else if (y===f.shape.length-1 && x === f.shape[y].length-1)
+			src += "case-sud_est";
+		//si coté nord
+		else if (y===0 && (x !== f.shape[y].length-1 && x !== 0))
+			src += "case-nord";
+		//si coté ouest
+		else if ((y !== f.shape.length-1 && y !== 0) && x===0)
+			src += "case-ouest";
+		//si coté est
+		else if ((y !== f.shape.length-1 && y !== 0) && x===f.shape[y].length-1)
+			src += "case-est";
+		//si coté sud
+		else if (y===f.shape.length-1 && (x !== f.shape[y].length-1 && x !== 0))
+			src += "case-sud";
+		//sinon pièce milieu (ou pas)
+		else
+			src = "";
+		
+		if (f.shape[y].charAt(x)==="1")
+			new Element('img', {'class':'caseMeuble', 'src':src+".png"}).inject(td);
+		//else
+			//new Element('img', {'class':'caseVide', 'src':"images/meuble/case-vide.png"}).inject(td);
+		return td;
+	}
+	
+	/*
+	 * Fonction collideInRoom
+	 * Description: Vérifie si le meuble, au coordonnées x/y, entre en collision avec un autre meuble dans la salle.
+	 *
+	 * x: coordonnées horizontal du meuble dans la salle.
+	 * y: coordonnées vertical du meuble dans la salle.
+	 *
+	 * retourne: 'true' si il entre en collision avec un autre meuble, sinon 'false'
+	 */
+	function collideInRoom(x, y) {
+		var x2, y2;
+		for (var i = 0; i < f.shape.length; ++i) {
+			y2 = y + i;		
+			for (var j = 0; j < f.shape[i].length; ++j) {
+				x2 = x + j;
+				var td = f.caseToTdAt(j, i);
+				if ((typeof room.tableau[y2][x2] !== 'undefined' && typeof room.tableau[y2][x2].meuble !== 'undefined') && typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+					return true;
+			}
+		}
+		return false;
+	}
+	
 	return f;
 }
 
@@ -83,40 +185,15 @@ function Furniture(nom, forme) {
 /************* EVENEMENT *************/
 /*************************************/
 document.addEventListener('DOMContentLoaded', function() {
-	$$('#cmdContainer input')[0].addEventListener('keydown', function onInputCmdKeyPress(e) {
+	/*$$('#cmdContainer input')[0].addEventListener('keydown', function onInputCmdKeyPress(e) {
 		if (e.keyCode == 13) //on appui sur la touche entrer
 			sendCmd(e.target.value);
-	});
+	});*/
 });
 
 /*********************************************/
 /************* FONCTIONS GENERAL *************/
 /*********************************************/
-
-/*
- * Fonction sendCmd
- * Description: Envoie une commande de type 'texte' (string) au compilateur pour qu'elle soit interprétée.
- *
- * cmd: la commande de type 'texte' (string)
- */
-function sendCmd(cmd) {
-	//alert("cmd envoyé"); //à supprimer
-	//var text = $("#textarea").val();
-	var filename = "to_compile.com";
-	var blob = new Blob([cmd], {type: "text/plain;charset=utf-8"});
-	//saveAs(blob, filename+".com");
-	var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(cmd));
-    element.setAttribute('download', filename);
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-	$$('#cmdContainer input')[0].value = "";
-}
 
 /*
  * Fonction loadFurniture
@@ -140,11 +217,51 @@ function loadFurniture(nom, forme) {
  * x: coordonnées horizontal dans la salle.
  * y: coordonnées vertical dans la salle.
  */
-function addFurnitureToRoom(meuble, x, y) {
-	//cases [{coordonnées, meuble(pere)},...]
-	room.tableau[y][x] = {'x':x, 'y': y, 'meuble': meuble};
+function addFurnitureToRoom(nomMeuble, x, y) {
+	var meuble = getFurnitureByName(nomMeuble);
+	var x2, y2;
+	//d'abord, tester qu'il n'y a pas de meuble à l'emplacement
+	if (meuble.collideInRoom(x, y)) {
+		addLog("Le meuble à ajouter est en collision avec un autre");
+		return;
+	}
+		
+	for (var i = 0; i < meuble.shape.length; ++i) {
+		y2 = y + i;		
+		for (var j = 0; j < meuble.shape[i].length; ++j) {
+			x2 = x + j;
+			var td = meuble.caseToTdAt(j, i);
+			if (typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+				room.tableau[y2][x2] = new CaseRoom(x, y, j, i, meuble);
+		}
+	}
 	room.empty = false;
 	refreshRoomView();
+	addLog("Meuble ajouté");
+}
+
+/*
+ * Fonction moveFurniture
+ * Description: Déplace un meuble actuellement en coordonnées x0/y0 vers les coordonnées x/y.
+ * 		L'affichage est rafraichie automatiquement.
+ *
+ * x0: coordonnées horizontal actuelle d'une des parties du meuble dans la salle.
+ * y0: coordonnées vertical actuelle d'une des parties du meuble dans la salle.
+ * x: coordonnées horizontal où placer le meuble dans la salle.
+ * y: coordonnées vertical où placer le meuble dans la salle.
+ */
+function moveFurniture(x0, y0, x, y) {
+	
+}
+
+/*
+ * Fonction addLog
+ * Description: Ajout un message dans la vue des logs.
+ *
+ * msg: message à afficher dans les logs.
+ */
+function addLog(msg) {
+	
 }
 
 /*
@@ -157,6 +274,8 @@ function addFurnitureToRoom(meuble, x, y) {
 function setRoomSize(metreCarre)  {
 	room = new Room(metreCarre);
 	refreshRoomView();
+	addLog("Salle réinitialisée");
+	addLog("La taille de la salle a été modifiée");
 }
 
 /******************************************************************/
