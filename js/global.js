@@ -244,12 +244,23 @@ function moveFurniture(x0, y0, x, y) {
 
 /*
  * Fonction rotateFurniture
- * Description: Duplique et effectue une rotation du meuble dans le sens horaire (par défaut).
+ * Description: Effectue une rotation du meuble dans le sens horaire (par défaut) dans la salle.
  *
  * meuble: un meuble de type 'Furniture'.
  * antiHoraire: (optionnelle) si vraie, le meuble sera tourné dans le sens anti-horaire.
  */
-function moveFurniture(meuble, antiHoraire) {
+function rotateFurniture(meuble, antiHoraire) {
+	
+}
+
+/*
+ * Fonction removeFurniture
+ * Description: Supprime un meuble à l'emplacement x/y dans la salle
+ *
+ * x: coordonnées horizontal où est placé le meuble dans la salle.
+ * y: coordonnées vertical où est placé le meuble dans la salle.
+ */
+function removeFurniture(x, y) {
 	
 }
 
