@@ -7,6 +7,11 @@
 	int yyerror (char const *message) {
 		fputs (message, stderr); fputc ('\n', stderr); return 0;
 	}
+
+	// Variables utilisées
+	int quantite;
+	int nbCoordonnees;
+	int estIncorrect;
 %}
 
 
@@ -17,28 +22,41 @@
 %token <str> Coordonnees
 %token <str> Meuble
 %left Retrait
-%type <str> S
 %type <str> E
 %type <str> C
 
 %%
 S :	
-	| S C eol		{printf("Commande détectée\n");} // Stocker les params et les renvoyer en JS
+	| S C eol		{
+					if (estIncorrect)
+						yyerror("Number of coordinates doesn't match to quantity");
+					else
+						printf("Commande détectée\n"); 
+					nbCoordonnees = 0;quantite = 0;estIncorrect = 0;
+				} 
 	| S error eol		{yyerrok;}
 
 C :	 C E	
 	|E
 
-E :	  Meuble Coordonnees				{printf("1\n");}
-	| Meuble Coordonnees Rotation			{printf("2\n");}
-	| Quantite Meuble Coordonnees			{printf("3\n");}
-	| Quantite Meuble Coordonnees Rotation		{printf("4\n");}
-	| Retrait Coordonnees			 	{printf("5\n");};
+E :	  Meuble Coordonnees				{printf("Ok\n");}
+	| Quantite Meuble T				{
+								quantite = quantite + $1;
+								if (quantite != nbCoordonnees)
+									estIncorrect = 1;
+							}
+	| Retrait Coordonnees			 	{printf("Retrait\n");}
+
+T :	  Coordonnees					{nbCoordonnees++;}
+	| Coordonnees Rotation				{nbCoordonnees++;}
+	| T Coordonnees					{nbCoordonnees++;}
+	| T Coordonnees Rotation			{nbCoordonnees++;};
 	
 %%
 
 
 int main(void) 
 {
+	nbCoordonnees = 0;estIncorrect = 0;quantite = 0;
 	return yyparse(); 
 }
