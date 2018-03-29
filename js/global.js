@@ -15,13 +15,18 @@ var furnitures = [];
  * retourne: une salle de type 'Room'
  */
 function Room(metreCarre) {
-	var tab = [[]];
+	var tab = [];
 	for (var i = 0; i < metreCarre; ++i) {
+		tab[i] = [];
 		for (var j = 0; j < metreCarre; ++j)
-			tab[i][j] = {};
+			tab[i][j] = new CaseRoom();
 	}
 	
 	return {taille: metreCarre, empty: true, tableau: tab};
+}
+
+function CaseRoom(x, y, x0, y0, meuble) {
+	return {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble};
 }
 
 /*
@@ -69,40 +74,7 @@ function Furniture(nom, forme) {
 		for (var i = 0; i < f.shape.length; ++i) {
 			var tr = new Element('tr').inject(table);
 			for (var j = 0; j < f.shape[i].length; ++j) {
-				var td = new Element('td').inject(tr);
-				var src = "images/meuble/";
-				//si coté nord/ouest
-				if (i===0 && j === 0)
-					src += "case-nord_ouest";
-				//si coté nord/est
-				else if (i===0 && j === f.shape[i].length-1)
-					src += "case-nord_est";
-				//si coté sud/ouest
-				else if (i===f.shape.length-1 && j === 0)
-					src += "case-sud_ouest";
-				//si coté sud/est
-				else if (i===f.shape.length-1 && j === f.shape[i].length-1)
-					src += "case-sud_est";
-				//si coté nord
-				else if (i===0 && (j !== f.shape[i].length-1 && j !== 0))
-					src += "case-nord";
-				//si coté ouest
-				else if ((i !== f.shape.length-1 && i !== 0) && j===0)
-					src += "case-ouest";
-				//si coté est
-				else if ((i !== f.shape.length-1 && i !== 0) && j===f.shape[i].length-1)
-					src += "case-est";
-				//si coté sud
-				else if (i===f.shape.length-1 && (j !== f.shape[i].length-1 && j !== 0))
-					src += "case-sud";
-				//sinon pièce milieu (ou pas)
-				else
-					src = "";
-				
-				if (f.shape[i].charAt(j)==="1")
-					new Element('img', {'class':'caseMeuble', 'src':src+".png"}).inject(td);
-				else
-					new Element('img', {'class':'caseMeuble vide', 'src':src+".png"}).inject(td);
+				caseToTdAt(j, i).inject(tr);
 			}
 		}
 		return table;
@@ -209,11 +181,27 @@ function loadFurniture(nom, forme) {
 }
 
 /*
+ * Fonction getFurnitureByName
+ * Description: Cherche et récupère un meuble par rapport à son nom
+ *
+ * nom: nom du meuble
+ *
+ * retourne: meuble de type Furniture
+ */
+function getFurnitureByName(nom) {
+	for (var i = 0; i < furnitures.length; ++i) {
+		if (furnitures[i].name === nom)
+			return furnitures[i];
+	}
+	return null;
+}
+
+/*
  * Fonction addFurnitureToRoom
  * Description: Ajoute un meuble de type 'furniture' dans la salle aux coordonnées x y.
  * 		L'affichage est rafraichie automatiquement.
  *
- * meuble: objet de type 'furniture' représentant un meuble.
+ * nomMeuble: nom d'un meuble.
  * x: coordonnées horizontal dans la salle.
  * y: coordonnées vertical dans la salle.
  */
@@ -322,20 +310,19 @@ function refreshFurnitureView() {
  */
 function refreshRoomView() {
 	var main = $$("#viewerContainer .canvasDiv")[0];
+		main.innerHTML = "";
 		var table = new Element('table').inject(main);
 			for (var i = 0; i < room.taille; ++i) {
 				var tr = new Element('tr').inject(table);
-				var f = furnitures[i];
 				for (var j = 0; j < room.taille; ++j) {
 					var c = room.tableau[i][j];
 					var td = new Element('td').inject(tr);
-						var div = new Element('div', {'id':c, 'class':'accessoire'}).inject(tr);
-							div = new Element('div', {'class':'inner'}).inject(div);
-								var name = new Element('div', {'class':'nameContainer'}).inject(div);
-									new Element('div', {'class':'nameLabel', 'html':'Nom:'}).inject(name);
-									new Element('div', {'class':'name', 'html':f.name}).inject(name);
-								var shape = new Element('div', {'class':'shapeContainer'}).inject(div);
-									f.shapeToHtml().inject(shape);
+						if (typeof c.meuble !== 'undefined') {
+							var div = new Element('div', {'id':c.meuble.name}).inject(td);
+								c.meuble.caseToTdAt(c.x0, c.y0).inject(div);
+						} else {
+							new Element('div', {'class':'caseVide'}).inject(td);
+						}
 				}
 			}
 }

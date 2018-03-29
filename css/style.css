@@ -4,10 +4,6 @@ body {
     justify-content: center;
 }
 
-/*#com_script {
-	display: none;
-}*/
-
 #mainDivWindow {
 	overflow: auto;
     background-color: #f9f9f9;
@@ -56,6 +52,13 @@ div.accessoire {
     width: 48px;
 }
 
+.caseVide{
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: #dcdcdc;
+    height: 48px;
+    width: 48px;
+}
+
 div.nameContainer >* {
 	float: left;
 }
@@ -72,4 +75,5 @@ div.nameLabel {
 #viewerContainer .canvasDiv {
 	height: 500px;
     width: 670px;
+	overflow: auto;
 }
