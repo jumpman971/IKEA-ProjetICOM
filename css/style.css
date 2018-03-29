@@ -38,6 +38,15 @@ div.canvasDiv {
     
 }
 
+div#log {
+	height: 110px;
+    width: 500px;
+    background-color: black;
+	color: white;
+	word-wrap: break-word;
+	overflow: auto;
+}
+
 div.accessoire {
 	//width: 120px;
     //height: 130px;

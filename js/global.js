@@ -207,10 +207,12 @@ function getFurnitureByName(nom) {
  */
 function addFurnitureToRoom(nomMeuble, x, y) {
 	var meuble = getFurnitureByName(nomMeuble);
+	if (meuble === null)
+		addLog("Le meuble sp&eacute;cifi&eacute; est introuvable");
 	var x2, y2;
 	//d'abord, tester qu'il n'y a pas de meuble à l'emplacement
 	if (meuble.collideInRoom(x, y)) {
-		addLog("Le meuble à ajouter est en collision avec un autre");
+		addLog("Le meuble &agrave; ajouter est en collision avec un autre");
 		return;
 	}
 		
@@ -225,7 +227,7 @@ function addFurnitureToRoom(nomMeuble, x, y) {
 	}
 	room.empty = false;
 	refreshRoomView();
-	addLog("Meuble ajouté");
+	addLog("Meuble ajout&eacute;");
 }
 
 /*
@@ -271,7 +273,10 @@ function removeFurniture(x, y) {
  * msg: message à afficher dans les logs.
  */
 function addLog(msg) {
-	
+	var hour = new Date();
+	hour = hour.getHours()+':'+hour.getMinutes()+':'+hour.getSeconds();
+	$$('#log .inner')[0].innerHTML += hour + " > " + msg + "<br/>";
+	$('log').scrollTop += 500;
 }
 
 /*
@@ -284,8 +289,10 @@ function addLog(msg) {
 function setRoomSize(metreCarre)  {
 	room = new Room(metreCarre);
 	refreshRoomView();
-	addLog("Salle réinitialisée");
-	addLog("La taille de la salle a été modifiée");
+	$('longueur').innerHTML = "Longueur : "+metreCarre+"m&sup2;";
+	$('largeur').innerHTML = "Largeur : "+metreCarre+"m&sup2;";
+	addLog("Salle r&eacute;initialis&eacute;e");
+	addLog("La taille de la salle a &eacute;t&eacute; modifi&eacute;e");
 }
 
 /******************************************************************/
