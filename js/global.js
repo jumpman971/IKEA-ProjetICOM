@@ -38,30 +38,36 @@ function Room(metreCarre) {
  * retourne: une case de la salle de type 'CaseRoom'
  */
 function CaseRoom(x, y, x0, y0, meuble) {
-	var c = {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble, 'isSameAt':isSameAt};
+	var c = {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble, 'collideInRoom':collideInRoom};
 	
 	/*
-	 * Fonction isSameAt
-	 * Description: Vérifie si la partie du meuble à cette emplacement fait partie du même meuble qu'à l'emplacement x/y
+	 * Fonction collideInRoom
+	 * Description: Vérifie si la partie du meuble à cet emplacement entre en collision
+	 * 		avec une autre partie d'un autre meuble et vérifie que cet autre meuble
+	 * 		n'est pas le même meuble
 	 *
 	 * x: coordonnées horizontal du meuble dans la salle.
 	 * y: coordonnées vertical du meuble dans la salle.
 	 *
-	 * retourne: 'true' si ils font partie du même meuble, sinon 'false'
+	 * retourne: 'true' si il est en collision avec un autre meuble, sinon 'false'
 	 */
-	function isSameAt(x, y) {
+	function collideInRoom(x, y) {
 		var x2, y2;
-		for (var i = 0; i < f.shape.length; ++i) {
+		var m = c.meuble;
+		for (var i = 0; i < m.shape.length; ++i) {
 			y2 = y + i;		
-			for (var j = 0; j < f.shape[i].length; ++j) {
+			for (var j = 0; j < m.shape[i].length; ++j) {
 				x2 = x + j;
-				var td = f.caseToTdAt(j, i);
-				if ((typeof room.tableau[y2][x2] !== 'undefined' && typeof room.tableau[y2][x2].meuble !== 'undefined') && typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+				var td = m.caseToTdAt(j, i);
+				var containAFurniture = (typeof room.tableau[y2][x2] !== 'undefined' && typeof room.tableau[y2][x2].meuble !== 'undefined');				
+				if (containAFurniture && !(room.tableau[y2][x2].x === c.x && room.tableau[y2][x2].y === c.y) && typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
 					return true;
 			}
 		}
 		return false;
 	}
+	
+	//if (c.x === room.tableau[y][x].x && c.y === room.tableau[y][x].y)
 	
 	return c;
 }
@@ -267,16 +273,18 @@ function moveFurniture(x0, y0, x, y) {
 	//récupérer le meuble à l'emplacement x0/y0
 	var c = room.tableau[y0][x0];
 	if (typeof c.meuble === 'undefined') {
-		addLog('Pas de meuble à cet emplacement');
+		addLog('Pas de meuble &agrave; cet emplacement');
 		return false;
 	}
 	//si les coordonnées x0/y0 ne sont pas à l'emplacement 0/0 du meuble, il faut appliquer un offset aux coordonnées x/y
 	if (c.x !== x0 || c.y  !== y0) {
+		//le calcul n'est pas bon
 		x = Math.abs(x - c.x);
 		y = Math.abs(y - c.y);
 	}
 	//vérifier que le meuble est déplaçable à l'emplacement x/y
-	if (c.meuble.collideInRoom(x, y) && !c.isSameAt(x,y)) { //vérifier aussi si on entre pas en collision avec le même meuble
+	//if (c.meuble.collideInRoom(x, y) && !c.isSameAt(x,y)) { //vérifier aussi si on entre pas en collision avec le même meuble
+	if (c.collideInRoom(x, y)) {
 		addLog('Impossible de d&eacute;placer le meuble '+c.meuble.name+" &agrave; l'emplacement "+x+"/"+y);
 		return false;
 	}
