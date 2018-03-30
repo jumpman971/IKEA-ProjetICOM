@@ -25,10 +25,6 @@ function Room(metreCarre) {
 	return {taille: metreCarre, empty: true, tableau: tab};
 }
 
-function CaseRoom(x, y, x0, y0, meuble) {
-	return {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble};
-}
-
 /*
  * Constructeur CaseRoom
  * Description: Instancie un objet de type 'caseRoom', qui correspond à un emplacement d'1m² dans la salle.
@@ -241,29 +237,74 @@ function addFurnitureToRoom(nomMeuble, x, y) {
  * y: coordonnées vertical où placer le meuble dans la salle.
  */
 function moveFurniture(x0, y0, x, y) {
+	//récupérer le meuble à l'emplacement x0/y0
 	
+	//vérifier que le meuble est déplaçable à l'emplacement x/y
+	
+	//dupliquer le meuble
+	
+	//supprimer l'ancien meuble dans la salle
+	
+	//placer le nouveau meuble
 }
 
 /*
  * Fonction rotateFurniture
  * Description: Effectue une rotation du meuble dans le sens horaire (par défaut) dans la salle.
  *
- * meuble: un meuble de type 'Furniture'.
+ * monMeuble: nom du meuble à tourner de type 'Furniture'.
  * antiHoraire: (optionnelle) si vraie, le meuble sera tourné dans le sens anti-horaire.
  */
-function rotateFurniture(meuble, antiHoraire) {
+function rotateFurniture(nomMeuble, antiHoraire) {
+	//dupliquer le meuble
 	
+	//tourner le meuble
+	
+	//vérifier que le meuble tourner est plaçable dans la salle
+	
+	//supprimer l'ancien meuble dans la salle et placer le meuble dupliquer
 }
 
 /*
  * Fonction removeFurniture
  * Description: Supprime un meuble à l'emplacement x/y dans la salle
- *
+ * 		L'affichage est rafraichie automatiquement.
  * x: coordonnées horizontal où est placé le meuble dans la salle.
  * y: coordonnées vertical où est placé le meuble dans la salle.
+ *
+ * retourne: vraie si le meuble a été supprimé, sinon faux
  */
 function removeFurniture(x, y) {
+	var c = room.tableau[y][x];
+	var meuble = c.meuble;
+	if (meuble === null) {
+		addLog('Aucun meuble &agrave; supprimer &agrave; cet emplacement');
+		return false;
+	}
+	var i = y - c.y0;
+	var i2 = i
+	var j = x - c.x0;
+	var j2 = j;
+	var table = $$('#viewerContainer .canvasDiv table tr');
+	for (var i0 = 0; i0 < meuble.shape.length; ++i0) {
+		//var tr = new Element('tr').inject(table);
+		i = i2 + i0;
+		var tr = table[i].querySelectorAll('tr > td');
+		j = j2;
+		for (var j0 = 0; j0 < meuble.shape[i0].length; ++j0) {
+			//caseToTdAt(j, i).inject(tr);
+			j = j2 + j0;
+			if (meuble.shape[i0].charAt(j0) !== '0') {
+				tr[j].innerHTML = "";
+				new Element('div', {'class':'caseVide'}).inject(tr[j]);
+				room.tableau[i][j] = new CaseRoom();
+			}
+		}
+	}
 	
+	refreshRoomView();
+	addLog('Le meuble '+meuble.name+' a &eacute;t&eacute; supprim&eacute;');
+	return true;
 }
 
 /*
