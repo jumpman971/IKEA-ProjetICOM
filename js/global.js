@@ -38,7 +38,32 @@ function Room(metreCarre) {
  * retourne: une case de la salle de type 'CaseRoom'
  */
 function CaseRoom(x, y, x0, y0, meuble) {
-	return {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble};
+	var c = {'x':x, 'y': y, 'x0': x0, 'y0':y0, 'meuble': meuble, 'isSameAt':isSameAt};
+	
+	/*
+	 * Fonction isSameAt
+	 * Description: Vérifie si la partie du meuble à cette emplacement fait partie du même meuble qu'à l'emplacement x/y
+	 *
+	 * x: coordonnées horizontal du meuble dans la salle.
+	 * y: coordonnées vertical du meuble dans la salle.
+	 *
+	 * retourne: 'true' si ils font partie du même meuble, sinon 'false'
+	 */
+	function isSameAt(x, y) {
+		var x2, y2;
+		for (var i = 0; i < f.shape.length; ++i) {
+			y2 = y + i;		
+			for (var j = 0; j < f.shape[i].length; ++j) {
+				x2 = x + j;
+				var td = f.caseToTdAt(j, i);
+				if ((typeof room.tableau[y2][x2] !== 'undefined' && typeof room.tableau[y2][x2].meuble !== 'undefined') && typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	return c;
 }
 
 /*
@@ -241,11 +266,18 @@ function addFurnitureToRoom(nomMeuble, x, y) {
 function moveFurniture(x0, y0, x, y) {
 	//récupérer le meuble à l'emplacement x0/y0
 	var c = room.tableau[y0][x0];
+	if (typeof c.meuble === 'undefined') {
+		addLog('Pas de meuble à cet emplacement');
+		return false;
+	}
 	//si les coordonnées x0/y0 ne sont pas à l'emplacement 0/0 du meuble, il faut appliquer un offset aux coordonnées x/y
-	
+	if (c.x !== x0 || c.y  !== y0) {
+		x = Math.abs(x - c.x);
+		y = Math.abs(y - c.y);
+	}
 	//vérifier que le meuble est déplaçable à l'emplacement x/y
-	if (c.meuble.collideInRoom(x, y)) { //vérifier aussi si on entre pas en collision avec le même meuble
-		addLog('Impossible de déplacer le meuble '+meuble.name+" &agrave; l'emplacement "+x+"/"+y);
+	if (c.meuble.collideInRoom(x, y) && !c.isSameAt(x,y)) { //vérifier aussi si on entre pas en collision avec le même meuble
+		addLog('Impossible de d&eacute;placer le meuble '+c.meuble.name+" &agrave; l'emplacement "+x+"/"+y);
 		return false;
 	}
 	//dupliquer le meuble
