@@ -235,17 +235,36 @@ function addFurnitureToRoom(nomMeuble, x, y) {
  * y0: coordonnées vertical actuelle d'une des parties du meuble dans la salle.
  * x: coordonnées horizontal où placer le meuble dans la salle.
  * y: coordonnées vertical où placer le meuble dans la salle.
+ *
+ * retourne: vraie si le meuble a été déplacé, sinon faux
  */
 function moveFurniture(x0, y0, x, y) {
 	//récupérer le meuble à l'emplacement x0/y0
+	var c = room.tableau[y0][x0];
+	//si les coordonnées x0/y0 ne sont pas à l'emplacement 0/0 du meuble, il faut appliquer un offset aux coordonnées x/y
 	
 	//vérifier que le meuble est déplaçable à l'emplacement x/y
-	
+	if (c.meuble.collideInRoom(x, y)) { //vérifier aussi si on entre pas en collision avec le même meuble
+		addLog('Impossible de déplacer le meuble '+meuble.name+" &agrave; l'emplacement "+x+"/"+y);
+		return false;
+	}
 	//dupliquer le meuble
-	
+	//var meuble = JSON.parse(JSON.stringify(c.meuble));
+	var meuble = Object.assign({}, c.meuble);
 	//supprimer l'ancien meuble dans la salle
-	
+	removeFurniture(x0,y0);	
 	//placer le nouveau meuble
+	for (var i = 0; i < meuble.shape.length; ++i) {
+		y2 = y + i;		
+		for (var j = 0; j < meuble.shape[i].length; ++j) {
+			x2 = x + j;
+			var td = meuble.caseToTdAt(j, i);
+			if (typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+				room.tableau[y2][x2] = new CaseRoom(x, y, j, i, meuble);
+		}
+	}
+	refreshRoomView();
+	addLog("Meuble d&eacute;plac&eacute;");
 }
 
 /*
