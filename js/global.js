@@ -148,7 +148,7 @@ function Furniture(nom, forme) {
 			src = "";
 		
 		if (f.shape[y].charAt(x)==="1")
-			new Element('img', {'class':'caseMeuble', 'src':src+".png"}).inject(td);
+			new Element('img', {'class':'caseMeuble'/*, 'src':src+".png"*/}).inject(td);
 		//else
 			//new Element('img', {'class':'caseVide', 'src':"images/meuble/case-vide.png"}).inject(td);
 		return td;
