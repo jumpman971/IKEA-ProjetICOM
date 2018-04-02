@@ -15,6 +15,7 @@ SPACE  " "
 %%
 
 \n						{return eol;}
+"exit"						{return Exit;}
 {ENTIER}					{yylval.num = atoi(yytext);return Quantite;}
 "-"						{return Retrait;}
 (rotate|Rotation|Rotate|rotation)		{return Rotation;}

@@ -11,6 +11,7 @@
 	int estIncorrect;
 	int numMessage = 0;
 	int sizeMessage;
+	int superficie;
 
 	// gestion strings
 	char* nomMessage;
@@ -19,11 +20,11 @@
 	char  strInitialisation[] = "loadFurniture('test', ['101', '101', '111']);";
 	
 
-	void updateNomMessage(char *nom, int num)
+	void updateNomMessage(char *nom, int* num)
 	{
-		num++;
+		*num=*num+1;
 		nom[0] = '\0';
-		sprintf(nom,"%s%d","received",num);
+		sprintf(nom,"%s%d","received",*num);
 	}
 
 	void buildMessage(char *message, char *nomMessage,char *code,int* lengthMessage)
@@ -33,6 +34,22 @@
 		sprintf(message,"%s%s%s%s%s","if (typeof ",nomMessage," === 'undefined' || !",nomMessage,") {");
 		sprintf(message,"%s%s",message,code);
 		*lengthMessage = sprintf(message,"%s%s%s",message,nomMessage," = true;}");
+	}
+
+	void sendMessage(char *message,int sizeMessage,char *nomMessage,int numMessage)
+	{
+		FILE *fp;
+   		fp = fopen( "../js/com.js" , "w" );
+   		fwrite(message , 1 , sizeMessage , fp );
+   		fclose(fp);
+		updateNomMessage(nomMessage,&numMessage);
+	}
+	
+	void clearFile()
+	{
+		FILE *fp;
+   		fp = fopen( "../js/com.js" , "w" );
+   		fclose(fp);
 	}
 	
 	int yyerror (char const *message) 
@@ -58,7 +75,7 @@
 
 %start S
 %union { int num; char* str; }
-%token Rotation eol
+%token Rotation eol Exit
 %token <num> Quantite
 %token <str> Coordonnees
 %token <str> Meuble
@@ -68,6 +85,8 @@
 
 %%
 S :	
+	
+	| S Exit eol		{	clearFile();exit(0);}
 	| S C eol		{
 					if (estIncorrect)
 						yyerror("Number of coordinates doesn't match to quantity");
@@ -98,20 +117,26 @@ T :	  Coordonnees					{nbCoordonnees++;}
 
 int main(void) 
 {
+	//Allocations
 	codeJS = (char*)malloc(sizeof(char)*500);
 	messageRetourne = (char*)malloc(sizeof(char)*500);
 	nomMessage = (char*)malloc(sizeof(char)*20);
 	
 	initVars();
 	
-	updateNomMessage(nomMessage, numMessage);
+	//Initialiser les éléments
+	updateNomMessage(nomMessage,&numMessage);
 	buildMessage(messageRetourne,nomMessage,strInitialisation,&sizeMessage);
+	sendMessage(messageRetourne,sizeMessage,nomMessage,numMessage);
 
+	//Choix de la superficie
+	printf("Console IKEA\n\nVeuillez entrer la superficie de la piece (entier) : ");
+	scanf("%d",&superficie);
+	sprintf(codeJS,"%s%d%s","setRoomSize(",superficie,");");
+	buildMessage(messageRetourne,nomMessage,codeJS,&sizeMessage);
+	sendMessage(messageRetourne,sizeMessage,nomMessage,numMessage); 
 
-	FILE *fp;
-   	fp = fopen( "../js/com.js" , "w" );
-   	fwrite(messageRetourne , 1 , sizeMessage , fp );
-   	fclose(fp);
+	return yyparse();
+	
 
-	return yyparse(); 
 }
