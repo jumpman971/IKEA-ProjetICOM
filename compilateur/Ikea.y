@@ -34,6 +34,7 @@
 		sprintf(message,"%s%s%s%s%s","if (typeof ",nomMessage," === 'undefined' || !",nomMessage,") {");
 		sprintf(message,"%s%s",message,code);
 		*lengthMessage = sprintf(message,"%s%s%s",message,nomMessage," = true;}");
+		code[0] = '\0';
 	}
 
 	void sendMessage(char *message,int sizeMessage,char *nomMessage,int numMessage)
