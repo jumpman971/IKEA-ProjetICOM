@@ -277,10 +277,12 @@ function moveFurniture(x0, y0, x, y) {
 		return false;
 	}
 	//si les coordonnées x0/y0 ne sont pas à l'emplacement 0/0 du meuble, il faut appliquer un offset aux coordonnées x/y
-	if (c.x !== x0 || c.y  !== y0) {
+	if (c.x !== x0) {
 		//le calcul n'est pas bon
-		x = Math.abs(x - c.x);
-		y = Math.abs(y - c.y);
+		x = x - c.x0;
+	}
+	if (c.y  !== y0) {
+		y = y - c.y0;
 	}
 	//vérifier que le meuble est déplaçable à l'emplacement x/y
 	//if (c.meuble.collideInRoom(x, y) && !c.isSameAt(x,y)) { //vérifier aussi si on entre pas en collision avec le même meuble
@@ -292,7 +294,7 @@ function moveFurniture(x0, y0, x, y) {
 	//var meuble = JSON.parse(JSON.stringify(c.meuble));
 	var meuble = Object.assign({}, c.meuble);
 	//supprimer l'ancien meuble dans la salle
-	removeFurniture(x0,y0);	
+	removeFurniture(x0,y0, true);	
 	//placer le nouveau meuble
 	for (var i = 0; i < meuble.shape.length; ++i) {
 		y2 = y + i;		
@@ -330,10 +332,11 @@ function rotateFurniture(nomMeuble, antiHoraire) {
  * 		L'affichage est rafraichie automatiquement.
  * x: coordonnées horizontal où est placé le meuble dans la salle.
  * y: coordonnées vertical où est placé le meuble dans la salle.
+ * nolog: n'affiche pas de message de suppression dans les logs quand la valeur est à 'true'
  *
  * retourne: vraie si le meuble a été supprimé, sinon faux
  */
-function removeFurniture(x, y) {
+function removeFurniture(x, y, nolog) {
 	var c = room.tableau[y][x];
 	var meuble = c.meuble;
 	if (meuble === null) {
@@ -362,7 +365,8 @@ function removeFurniture(x, y) {
 	}
 	
 	refreshRoomView();
-	addLog('Le meuble '+meuble.name+' a &eacute;t&eacute; supprim&eacute;');
+	if (!nolog)
+		addLog('Le meuble '+meuble.name+' a &eacute;t&eacute; supprim&eacute;');
 	return true;
 }
 
@@ -430,8 +434,17 @@ function refreshRoomView() {
 	var main = $$("#viewerContainer .canvasDiv")[0];
 		main.innerHTML = "";
 		var table = new Element('table').inject(main);
+			var tr = new Element('tr').inject(table);
+				var td = new Element('td').inject(tr);
+					new Element('div', {'class':'caseCoord'}).inject(td);
+				for (var i = 0; i < room.taille; ++i) {
+					td = new Element('td').inject(tr);
+						new Element('div', {'class':'caseCoord', 'html':i}).inject(td);
+				}
 			for (var i = 0; i < room.taille; ++i) {
 				var tr = new Element('tr').inject(table);
+					var td = new Element('td').inject(tr);
+						new Element('div', {'class':'caseCoord', 'html':i}).inject(td);
 				for (var j = 0; j < room.taille; ++j) {
 					var c = room.tableau[i][j];
 					var td = new Element('td').inject(tr);
