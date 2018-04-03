@@ -455,13 +455,13 @@ function addLog(msg) {
  * Description: Modifie la taille de la salle (supprime tout meuble à l'interieur).
  * 		L'affichage est rafraichie automatiquement.
  *
- * metreCarre: taille en mètre carré de la salle (1m² => 1case)
+ * metreCarre: taille en mètre de la salle (1m x 1m => 1case)
  */
-function setRoomSize(metreCarre)  {
-	room = new Room(metreCarre);
+function setRoomSize(metre)  {
+	room = new Room(metre);
 	refreshRoomView();
-	$('longueur').innerHTML = "Longueur : "+metreCarre+"m&sup2;";
-	$('largeur').innerHTML = "Largeur : "+metreCarre+"m&sup2;";
+	$('longueur').innerHTML = "Longueur : "+metre+"m";
+	$('largeur').innerHTML = "Largeur : "+metre+"m";
 	addLog("Salle r&eacute;initialis&eacute;e");
 	addLog("La taille de la salle a &eacute;t&eacute; modifi&eacute;e");
 }
