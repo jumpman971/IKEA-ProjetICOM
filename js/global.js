@@ -313,17 +313,77 @@ function moveFurniture(x0, y0, x, y) {
  * Fonction rotateFurniture
  * Description: Effectue une rotation du meuble dans le sens horaire (par défaut) dans la salle.
  *
- * monMeuble: nom du meuble à tourner de type 'Furniture'.
+ * x: coordonnées horizontal actuelle d'une des parties du meuble dans la salle.
+ * y: coordonnées vertical actuelle d'une des parties du meuble dans la salle.
  * antiHoraire: (optionnelle) si vraie, le meuble sera tourné dans le sens anti-horaire.
  */
-function rotateFurniture(nomMeuble, antiHoraire) {
+function rotateFurniture(x, y, antiHoraire) {
+	//récupérer le meuble à l'emplacement x0/y0
+	var c = room.tableau[y][x];
+	if (typeof c.meuble === 'undefined') {
+		addLog('Pas de meuble &agrave; cet emplacement');
+		return false;
+	}
+	if (c.x !== x || c.y  !== y) {
+		x = c.x;
+		y = c.y;
+	}
 	//dupliquer le meuble
+	var meuble = Object.assign({}, c.meuble);
 	
 	//tourner le meuble
+	if (antiHoraire) {
+		
+	} else {
+		var shape = [];
+		var i2, j2;
+		for (var j = 0; j < meuble.shape[0].length; ++j) {
+			i2 = 0;
+			shape[j] = "";
+			for (var i = meuble.shape.length-1; i >= 0; --i) {
+				shape[j] += meuble.shape[i].charAt(j);
+				++i2;
+			}
+		}
+	}
+	var r = new Furniture(meuble.name, shape);
 	
 	//vérifier que le meuble tourner est plaçable dans la salle
+	function collideInRoom(meuble, x, y) {
+		var x2, y2;
+		var m = meuble;
+		for (var i = 0; i < m.shape.length; ++i) {
+			y2 = y + i;		
+			for (var j = 0; j < m.shape[i].length; ++j) {
+				x2 = x + j;
+				var td = m.caseToTdAt(j, i);
+				var containAFurniture = (typeof room.tableau[y2][x2] !== 'undefined' && typeof room.tableau[y2][x2].meuble !== 'undefined');				
+				if (containAFurniture && !(room.tableau[y2][x2].x === c.x && room.tableau[y2][x2].y === c.y) && typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+					return true;
+			}
+		}
+		return false;
+	}
+	if (collideInRoom(r, x, y)) {
+		addLog("Impossible de tourner le meuble car il entre en collision apr&egrave;s rotation");
+		addLog("D&eacute;placer le meuble d'abord");
+		return;
+	}
 	
 	//supprimer l'ancien meuble dans la salle et placer le meuble dupliquer
+	removeFurniture(x,y, true);
+	for (var i = 0; i < r.shape.length; ++i) {
+		y2 = y + i;		
+		for (var j = 0; j < r.shape[i].length; ++j) {
+			x2 = x + j;
+			var td = r.caseToTdAt(j, i);
+			if (typeof td.getElementsByClassName('caseMeuble')[0] !== 'undefined')
+				room.tableau[y2][x2] = new CaseRoom(x, y, j, i, r);
+		}
+	}
+	
+	refreshRoomView();
+	addLog("Meuble tourn&eacute;");
 }
 
 /*
