@@ -146,9 +146,16 @@ function Furniture(nom, forme) {
 		//sinon pièce milieu (ou pas)
 		else
 			src = "";
+			
+		if (src !== "")
+			src += ".png";
+		else if (f.shape[y].charAt(x)==="1") {
+			new Element('img', {'class':'caseMeuble'}).inject(td);
+			return td
+		}
 		
 		if (f.shape[y].charAt(x)==="1")
-			new Element('img', {'class':'caseMeuble', 'src':src+".png"}).inject(td);
+			new Element('img', {'class':'caseMeuble', 'src':src}).inject(td);
 		//else
 			//new Element('img', {'class':'caseVide', 'src':"images/meuble/case-vide.png"}).inject(td);
 		return td;
@@ -470,13 +477,14 @@ function setRoomSize(metreCarre)  {
 function refreshFurnitureView() {
 	var main = $$("#furnitureContainer .canvasDiv")[0];
 		main.innerHTML = "";
-		var table = new Element('table').inject(main);
+		//var table = new Element('table').inject(main);
 			var tr;
 			for (var i = 0; i < furnitures.length; ++i) {
-				if (i%3 === 0)
-					tr = new Element('tr').inject(table);
+				/*if (i%3 === 0)
+					tr = new Element('tr').inject(table);*/
+				tr = main;
 				var f = furnitures[i];
-					var td = new Element('td').inject(tr);
+					//var td = new Element('td').inject(tr);
 						var div = new Element('div', {'id':f.name, 'class':'accessoire'}).inject(tr);
 							div = new Element('div', {'class':'inner'}).inject(div);
 								var name = new Element('div', {'class':'nameContainer'}).inject(div);

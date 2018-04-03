@@ -47,11 +47,16 @@ div#log {
 	overflow: auto;
 }
 
+div.accessoire .nameContainer {
+	padding-bottom: 30px;
+}
+
 div.accessoire {
 	//width: 120px;
     //height: 130px;
     background-color: #9abaf5;
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	//width: 180px;
 }
 
 .caseMeuble {
@@ -89,7 +94,15 @@ div.nameLabel {
 #furnitureContainer .canvasDiv {
 	height: 500px;
     width: 500px;
+	overflow: auto;
 }
+
+#furnitureContainer .canvasDiv > * {
+	float: left;
+	margin-right: 15px;
+	margin-bottom: 15px;
+}
+
 
 #viewerContainer .canvasDiv {
 	height: 500px;
