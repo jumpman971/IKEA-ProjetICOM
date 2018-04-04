@@ -23,7 +23,7 @@
 	char* nomMessage;
 	char* codeJS;
 	char* messageRetourne;
-	char  strInitialisation[] = "loadFurniture('test', ['101', '101', '111']);";
+	char  strInitialisation[] = "loadFurniture('Evier', ['111111', '111111']);loadFurniture('Four', ['111', '111', '111']);loadFurniture('Refrigerateur', ['11', '11', '11']);loadFurniture('Lave-vaisselle', ['11', '11']);loadFurniture('Comptoir', ['000001', '111111']);loadFurniture('Table', ['1111', '1111']);";
 	
 
 	void updateNomMessage(char *nom, int* num)
@@ -63,6 +63,11 @@
 	void delMeuble(char *code,int x,int y,int* lengthCode)
 	{
 		*lengthCode = sprintf(code,"%s%s%d%s%d%s",code,"removeFurniture(",x,",",y,",false);");
+	}
+
+	void rotMeuble(char *code,int x,int y,int* lengthCode)
+	{
+		*lengthCode = sprintf(code,"%s%s%d%s%d%s",code,"rotateFurniture(",x,",",y,");");
 	}
 
 	void moveMeuble(char *code,int x0,int y0,int x,int y,int* lengthCode)
@@ -158,6 +163,9 @@ E :	  Meuble Coordonnees				{
 							}
 	| Retrait Coordonnees			 	{
 								delMeuble(codeJS,$2.x,$2.y,&sizeCodeJS);
+							}
+	| Rotation Coordonnees			 	{
+								rotMeuble(codeJS,$2.x,$2.y,&sizeCodeJS);
 							}
 	| Move Coordonnees Coordonnees			{
 								moveMeuble(codeJS,$2.x,$2.y,$3.x,$3.y,&sizeCodeJS);
