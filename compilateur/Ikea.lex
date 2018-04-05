@@ -3,11 +3,17 @@
 	#include <string.h>
 	#include "y.tab.h"
 	
-	int echo(char *msg){
-		fprintf(stderr, "[%s:%s]", msg, yytext);
-
-	}
-	
+	/*
+	 * Fonction strCoordToInts
+	 * Description: lit des coordonnées en chaine de caractère et copie l'abscisse et l'ordonnée dans les
+	 *		entiers entrés en paramètre
+	 * 
+	 * strCoord: Coordonnées en chaine de caractères
+	 * x: abscisse.
+	 * y: ordonnée.
+	 *
+	 * retourne: rien
+	 */
 	void strCoordToInts(char* strCoord, int* x, int* y)
 	{
 	  	char * separator = ",";
